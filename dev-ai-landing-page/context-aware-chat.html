@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context-Aware Chat - DevAI Technical Deep Dive</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-javascript.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --accent-color: #22c55e;
+            --accent-dark: #16a34a;
+            --accent-light: #86efac;
+            --border-color: #e5e7eb;
+        }
+
+        .theme-dark {
+            --bg-color: #1f2937;
+            --text-color: #ffffff;
+            --accent-color: #4b5563;
+            --accent-dark: #374151;
+            --accent-light: #9ca3af;
+            --border-color: #374151;
+            --soft-border: rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-dark .border,
+        .theme-dark .border-t,
+        .theme-dark .border-b,
+        .theme-dark .border-l,
+        .theme-dark .border-r {
+            border-color: var(--soft-border);
+        }
+
+        .theme-dark .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-dark .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-green {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --accent-color: #22c55e;
+            --accent-dark: #16a34a;
+            --accent-light: #86efac;
+            --border-color: #e5e7eb;
+        }
+
+        .theme-blue {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --accent-color: #2563eb;
+            --accent-dark: #1d4ed8;
+            --accent-light: #93c5fd;
+            --border-color: #e5e7eb;
+        }
+
+        /* Add smooth transitions */
+        * {
+            transition-property: color, background-color, border-color;
+            transition-duration: 200ms;
+        }
+
+        /* Blog-specific styles */
+        .prose {
+            max-width: 65ch;
+            margin: 0 auto;
+        }
+        .prose pre {
+            background: #1f2937;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+        }
+    </style>
+    <script>
+        const CONFIG = {
+            DEFAULT_THEME: 'light'
+        };
+
+        const applyTheme = (theme) => {
+            const root = document.documentElement;
+            const themeButtons = document.querySelectorAll('.theme-btn');
+            
+            // Remove active state from all buttons
+            themeButtons.forEach(btn => btn.classList.remove('ring-2', 'ring-offset-2'));
+            
+            // Add active state to selected theme button
+            const activeButton = document.querySelector(`[data-theme="${theme}"]`);
+            if (activeButton) {
+                activeButton.classList.add('ring-2', 'ring-offset-2');
+            }
+
+            // Remove any existing theme classes
+            root.classList.remove('theme-dark', 'theme-green', 'theme-blue');
+            
+            // Add the new theme class
+            if (theme !== 'light') {
+                root.classList.add(`theme-${theme}`);
+            }
+            
+            localStorage.setItem('selected-theme', theme);
+        };
+
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('selected-theme') || CONFIG.DEFAULT_THEME;
+            applyTheme(savedTheme);
+        });
+    </script>
+</head>
+<body class="bg-[var(--bg-color)]">
+    <!-- Navigation -->
+    <nav class="bg-[var(--bg-color)] border-b border-[var(--border-color)] fixed w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fas fa-arrow-left text-[var(--accent-color)] mr-2"></i>
+                        <span class="text-[var(--text-color)]">Back to Home</span>
+                    </a>
+                </div>
+                
+                <!-- Theme toggles -->
+                <div class="flex items-center space-x-3">
+                    <button 
+                        class="theme-btn w-10 h-10 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2 shadow-md"
+                        style="border-color: var(--text-color)"
+                        data-theme="dark"
+                        onclick="applyTheme('dark')"
+                        title="Dark Theme">
+                        <i class="fas fa-moon text-xl text-[var(--text-color)]"></i>
+                    </button>
+                    <button 
+                        class="theme-btn w-10 h-10 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2 shadow-md"
+                        style="border-color: var(--text-color)"
+                        data-theme="green"
+                        onclick="applyTheme('green')"
+                        title="Green Theme">
+                        <i class="fas fa-leaf text-xl text-[var(--text-color)]"></i>
+                    </button>
+                    <button 
+                        class="theme-btn w-10 h-10 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2 shadow-md"
+                        style="border-color: var(--text-color)"
+                        data-theme="blue"
+                        onclick="applyTheme('blue')"
+                        title="Blue Theme">
+                        <i class="fas fa-water text-xl text-[var(--text-color)]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-24 pb-16">
+        <article class="prose mx-auto px-4">
+            <h1 class="text-4xl font-bold text-[var(--text-color)] mb-8">Feature Documentation Template</h1>
+            
+            <!-- Feature Overview -->
+            <div class="mb-12">
+                <img src="https://placehold.co/800x400" alt="Feature Overview Illustration" class="rounded-lg shadow-lg w-full">
+                <p class="text-sm text-[var(--text-color)] opacity-70 mt-2 text-center">Add a relevant feature illustration or diagram here</p>
+            </div>
+
+            <!-- Feature Description -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold text-[var(--text-color)] mb-4">Context-Aware Chat</h2>
+                <p class="text-[var(--text-color)] mb-6" style="text-align: justify;">
+                    This is an intelligent chat system that understands your codebase context and also can significantly enhance productivity by providing top-matched/relevant and precise interactions. This feature allows developers to seamlessly navigate their codebase without the need for manual searches. Suppose you need to edit a specific section of your code, but you don’t know its exact location among numerous files. Instead of spending time searching manually, this feature intelligently scans your codebase and retrieves the top matching results. It also displays the file names where these matches are found, allowing you to quickly locate the desired section. This eliminates the hassle of navigating through multiple files and makes code modifications faster and more efficient.  <br>
+
+                    Moreover, once the relevant section is identified, you have the flexibility to edit it manually or pass it to another feature that can modify it based on your provided guidelines. This ensures that changes are made accurately and consistently while minimizing errors. Whether you are working on a large-scale project or collaborating with a team, this feature streamlines code navigation and modification, ultimately improving development efficiency. By acting as an intelligent assistant that understands your codebase, it transforms the way developers interact with their projects, making coding more intuitive and productive.<br>
+ 
+                    Currently this feature supports the files with any extention if included in .js, .c, .cpp, .cs, .py, .java, .ts, .go, .rb, .php, .html, .css. In future, we will try to extend it to more extensions.<br><br>
+                    
+                    On the <strong>backend side</strong>, a pre-trained Jina AI model is loaded as an embedding model and tokenizer for the embeddings and tokenization purposes. Also we are creating local Qdrant database for the vector storage (embeddings storage, create using Jinna model). Everytime you will search, new embeddings wil be generated to ensure that you might be updated the code with new editions, so embeddings must be updated, results in effective result. <br>
+
+                    After this, the code will scan the codebase including all the files with extenstion we are offering currently. After scanning, each function, tag, block, conditions, loops using regex expressions. This result will be passed through the tokenizer to create chunks. Each chunk will be embedded & these embeddings will be stored in Qdrant database. <br>
+
+                    When the user will enter any query, that natural language query will also be converted into an embedding. The a searche will happen for getting from Qdrant database the closest matching code snippets. After getting results it will display the top 3 matching answers. 
+                </p>
+                <div class="space-y-6">
+                    <!-- Feature Component Template -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+                        <div class="flex items-center mb-3">
+                            <code class="bg-[var(--accent-color)] text-white px-3 py-1 rounded-md font-mono text-sm">Context-Aware Chat</code>
+                        </div>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Here, you have to write the steps as you'll be implementing it in extension.
+                        </p>
+                        <div class="mt-3 text-sm">
+                            <strong class="text-[var(--text-color)]">Example:</strong> 
+                            <span class="text-[var(--text-color)]">"Users can enter queries like "Find the function that handles user authentication," and the system will return relevant code snippets. Utilizes Cosine Similarity in Qdrant to rank the best-matching results.</span> 
+                            <code class="bg-[var(--accent-color)] bg-opacity-10 dark:bg-opacity-20 text-white dark:text-white px-2 py-0.5 rounded font-mono border border-[var(--accent-color)] border-opacity-20">[example code]</code>
+                            <span class="text-[var(--text-color)]">"</span>
+                        </div>
+                    </div>
+
+                    <!-- Add more components as needed -->
+                </div>
+            </section>
+
+            <!-- Key Features -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold text-[var(--text-color)] mb-4">Key Features</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Feature Card Template -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+                        <h3 class="text-lg font-semibold text-[var(--text-color)] mb-2">Multi-Language Code Support</h3>
+                        <p class="text-[var(--text-color)] opacity-80" style="text-align: justify">
+                            This Supports multiple programming languages, including Python, Java, C, C++, JavaScript, TypeScript, Go, PHP, Ruby, and more. Uses regex patterns to extract functions, methods, and classes for effective indexing.
+                        </p>
+                    </div>
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+                        <h3 class="text-lg font-semibold text-[var(--text-color)] mb-2">Automated Code Search & Retrieval</h3>
+                        <p class="text-[var(--text-color)] opacity-80" style="text-align: justify">
+                            The system allows users to find specific code sections without manually searching through files. It indexes code snippets and retrieves the most relevant results based on natural language queries. 
+                        </p>
+                    </div>
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+                        <h3 class="text-lg font-semibold text-[var(--text-color)] mb-2">Context-Aware Editing</h3>
+                        <p class="text-[var(--text-color)] opacity-80" style="text-align: justify">
+                            After finding the relevant code section, users can either manually edit it or pass it to another AI-assisted editing feature that follows all your specified instructions and will make edits.
+                        </p>
+                    </div>
+                    <!-- Add more feature cards as needed -->
+                </div>
+            </section>
+
+            <!-- Future Enhancements -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold text-[var(--text-color)] mb-4">Future Enhancements</h2>
+                <ul class="list-disc pl-6 space-y-4 text-[var(--text-color)]">
+                    <li>More regex patterns for better searching from codebase including different programming languages.</li>
+                    <li>Cloud-based Qdrant or optimize embedding storage for large-scale codebases.</li>
+                    <li>A ranking mechanism to prioritize the most useful results, in abetter and most effective way.</li>
+                    <!-- Add more planned enhancements -->
+                </ul>
+            </section>
+
+            <!-- Usage Guidelines -->
+            <section class="mb-12">
+                <h2 class="text-2xl font-bold text-[var(--text-color)] mb-4">Usage Guidelines</h2>
+                <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+                    <p class="text-[var(--text-color)] mb-4" style="text-align: justify">
+                        <strong>I.</strong> The system works best when queries are descriptive, e.g., "Find the function that initializes the database connection."<br>
+                        <strong>II.</strong> Proper structuring and consistent naming of functions help improve search accuracy.<br>
+                        <strong>III.</strong> If you are making frequent changes in your code, rerun to update stored embeddings.
+                    </p>
+                    <div class="bg-[var(--accent-color)] bg-opacity-10 p-4 rounded-lg">
+                        <h4 class="font-semibold text-[var(--text-color)] mb-2">Pro Tip</h4>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Add helpful tips and tricks here
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </article>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p>&copy; 2024 DevAI. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Prism.js for syntax highlighting
+        Prism.highlightAll();
+    </script>
+</body>
+</html> 
+</html> 

@@ -1,0 +1,47 @@
+// Type definition for GroqModel enum
+export type GroqModel = 
+  // Production models
+  | "distil-whisper-large-v3-en" 
+  | "gemma2-9b-it" 
+  | "llama-3.3-70b-versatile" 
+  | "llama-3.1-8b-instant" 
+  | "llama-guard-3-8b" 
+  | "llama3-70b-8192" 
+  | "llama3-8b-8192" 
+  | "mixtral-8x7b-32768" 
+  | "whisper-large-v3" 
+  | "whisper-large-v3-turbo"
+  // Preview models
+  | "deepseek-r1-distill-llama-70b" 
+  | "llama-3.3-70b-specdec" 
+  | "llama-3.2-1b-preview" 
+  | "llama-3.2-3b-preview" 
+  | "llama-3.2-11b-vision-preview" 
+  | "llama-3.2-90b-vision-preview";
+
+// Configuration interface for Groq model settings
+export interface GroqConfig {
+  model: GroqModel;             // Required model selection
+  temperature?: number;        // Optional temperature parameter
+  max_completion_tokens?: number;// Optional maximum completion tokens
+  top_p?: number;               // Optional top_p parameter
+  stream?: boolean;             // Optional streaming flag
+  stop?: string[] | null;        // Optional stop sequence or null
+}
+
+// Message interface for request/response format
+export interface GroqMessage {
+  role: string;                 // Role of the message (e.g., "user" or "assistant")
+  content: string;              // Content of the message
+}
+
+// Request body interface for API requests
+export interface GroqRequestBody {
+  messages: GroqMessage[];       // Array of messages
+  model: GroqModel;              // Selected model for the request
+  temperature?: number;         // Temperature parameter
+  max_completion_tokens?: number;// Maximum completion tokens
+  top_p?: number;               // Top_p parameter
+  stream?: boolean;              // Streaming flag
+  stop?: string[] | null;        // Stop sequence or null
+}

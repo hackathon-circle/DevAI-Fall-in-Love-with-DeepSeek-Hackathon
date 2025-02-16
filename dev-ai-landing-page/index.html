@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevAI - AI-Powered Development Assistant</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        const CONFIG = {
+            DEFAULT_THEME: 'light'
+        };
+
+        const applyTheme = (theme) => {
+            const root = document.documentElement;
+            const themeButtons = document.querySelectorAll('.theme-btn');
+            
+            // Remove active state from all buttons
+            themeButtons.forEach(btn => btn.classList.remove('ring-2', 'ring-offset-2'));
+            
+            // Add active state to selected theme button
+            const activeButton = document.querySelector(`[data-theme="${theme}"]`);
+            if (activeButton) {
+                activeButton.classList.add('ring-2', 'ring-offset-2');
+            }
+
+            // Remove any existing theme classes
+            root.classList.remove('theme-dark', 'theme-green', 'theme-blue');
+            
+            // Add the new theme class
+            if (theme !== 'light') {
+                root.classList.add(`theme-${theme}`);
+            }
+            
+            localStorage.setItem('selected-theme', theme);
+        };
+
+        // Initialize theme
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('selected-theme') || CONFIG.DEFAULT_THEME;
+            applyTheme(savedTheme);
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    // Close mobile menu if open
+                    document.getElementById('mobileMenu').classList.add('hidden');
+                    
+                    // Calculate header height
+                    const headerHeight = document.querySelector('header').offsetHeight;
+                    
+                    // Scroll to element with offset for fixed header
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --accent-color: #22c55e;
+            --accent-dark: #16a34a;
+            --accent-light: #86efac;
+            --border-color: #e5e7eb;
+        }
+
+        .theme-dark {
+            --bg-color: #1f2937;
+            --text-color: #ffffff;
+            --accent-color: #4b5563;
+            --accent-dark: #374151;
+            --accent-light: #9ca3af;
+            --border-color: #374151;
+            --soft-border: rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-dark .border,
+        .theme-dark .border-t,
+        .theme-dark .border-b,
+        .theme-dark .border-l,
+        .theme-dark .border-r {
+            border-color: var(--soft-border);
+        }
+
+        .theme-dark .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-dark .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-green {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --accent-color: #22c55e;
+            --accent-dark: #16a34a;
+            --accent-light: #86efac;
+            --border-color: #e5e7eb;
+        }
+
+        .theme-blue {
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+            --accent-color: #2563eb;
+            --accent-dark: #1d4ed8;
+            --accent-light: #93c5fd;
+            --border-color: #e5e7eb;
+        }
+
+        /* Add smooth transitions */
+        * {
+            transition-property: color, background-color, border-color;
+            transition-duration: 200ms;
+        }
+
+        /* Rest of your styles */
+        .feature-card {
+            position: relative;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 4px;
+            background-color: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        .carousel-container {
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                margin-left: 16rem;
+            }
+        }
+
+        /* Theme-specific styles */
+        :root {
+            --primary-color: #22c55e;
+        }
+
+        [data-theme="blue"] {
+            --primary-color: #2563eb;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #3b82f6;
+        }
+
+        .theme-toggle-btn {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 50;
+        }
+
+        :root {
+            --primary-bg: #22c55e;
+            --primary-text: #166534;
+            --bg-color: #ffffff;
+            --text-color: #1f2937;
+        }
+
+        [data-theme="blue"] {
+            --primary-bg: #2563eb;
+            --primary-text: #1e40af;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1f2937;
+            --text-color: #ffffff;
+            --primary-bg: #3b82f6;
+            --primary-text: #60a5fa;
+        }
+
+        /* Add visual feedback for active theme */
+        .theme-btn.active {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary-bg);
+        }
+
+        /* Add these classes */
+        .bg-theme {
+            background-color: var(--bg-color);
+        }
+
+        .text-theme {
+            color: var(--text-color);
+        }
+
+        /* Add these mobile-specific styles */
+        @media (max-width: 768px) {
+            .feature-card {
+                padding-left: 1.5rem;
+            }
+            
+            .feature-card::before {
+                width: 3px;
+            }
+            
+            /* Improve touch targets on mobile */
+            button, 
+            a {
+                min-height: 44px;
+                padding: 0.75rem 1rem;
+            }
+            
+            /* Improve text readability on mobile */
+            p {
+                line-height: 1.6;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <!-- Add a fixed header with proper z-index -->
+    <header class="fixed top-0 left-0 right-0 bg-[var(--bg-color)] border-b border-[var(--border-color)] shadow-sm z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <span class="text-xl font-semibold flex items-center gap-2 text-[var(--text-color)]">
+                        <i class="fas fa-robot text-[var(--accent-color)]"></i>
+                        DevAI
+                    </span>
+                </div>
+
+                <!-- Mobile menu button -->
+                <button class="md:hidden p-2 rounded-md text-[var(--text-color)]" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+
+                <!-- Navigation - Desktop -->
+                <nav class="hidden md:flex items-center space-x-6">
+                    <a href="#features" class="text-[var(--text-color)] hover:text-[var(--accent-color)] transition-colors">Features</a>
+                    <!-- <a href="#team" class="text-[var(--text-color)] hover:text-[var(--accent-color)] transition-colors">Join Team</a> -->
+                    <a href="https://github.com/yourusername/devai" target="_blank" class="text-[var(--text-color)] hover:text-[var(--accent-color)] transition-colors">
+                        <i class="fab fa-github mr-1"></i> GitHub
+                    </a>
+                    <button class="px-4 py-2 bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold rounded-lg transition duration-300">
+                        Install Extension
+                    </button>
+                    
+                    <!-- Theme toggles -->
+                    <div class="flex items-center space-x-3">
+                        <button 
+                            class="theme-btn w-10 h-10 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2 shadow-md"
+                            style="border-color: var(--text-color)"
+                            data-theme="dark"
+                            onclick="applyTheme('dark')"
+                            title="Dark Theme">
+                            <i class="fas fa-moon text-xl text-[var(--text-color)]"></i>
+                        </button>
+                        <button 
+                            class="theme-btn w-10 h-10 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2 shadow-md"
+                            style="border-color: var(--text-color)"
+                            data-theme="green"
+                            onclick="applyTheme('green')"
+                            title="Green Theme">
+                            <i class="fas fa-leaf text-xl text-[var(--text-color)]"></i>
+                        </button>
+                        <button 
+                            class="theme-btn w-10 h-10 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2 shadow-md"
+                            style="border-color: var(--text-color)"
+                            data-theme="blue"
+                            onclick="applyTheme('blue')"
+                            title="Blue Theme">
+                            <i class="fas fa-water text-xl text-[var(--text-color)]"></i>
+                        </button>
+                    </div>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-[var(--bg-color)] border-t border-[var(--border-color)]">
+            <div class="px-4 py-3 space-y-4">
+                <a href="#features" class="block text-[var(--text-color)] hover:text-[var(--accent-color)] py-2">Features</a>
+                <a href="#team" class="block text-[var(--text-color)] hover:text-[var(--accent-color)] py-2">Join Team</a>
+                <a href="https://github.com/yourusername/devai" target="_blank" class="block text-[var(--text-color)] hover:text-[var(--accent-color)] py-2">
+                    <i class="fab fa-github mr-1"></i> GitHub
+                </a>
+                <button class="w-full text-left px-4 py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold rounded-lg transition duration-300">
+                    Install Extension
+                </button>
+                
+                <!-- Mobile Theme Toggles -->
+                <div class="flex items-center gap-3 py-2">
+                    <button 
+                        class="theme-btn w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2"
+                        style="border-color: var(--text-color)"
+                        data-theme="dark"
+                        onclick="applyTheme('dark')"
+                        title="Dark Theme">
+                        <i class="fas fa-moon text-[var(--text-color)]"></i>
+                    </button>
+                    <button 
+                        class="theme-btn w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2"
+                        style="border-color: var(--text-color)"
+                        data-theme="green"
+                        onclick="applyTheme('green')"
+                        title="Green Theme">
+                        <i class="fas fa-leaf text-[var(--text-color)]"></i>
+                    </button>
+                    <button 
+                        class="theme-btn w-8 h-8 rounded-full transition-all duration-200 hover:scale-110 flex items-center justify-center bg-[var(--bg-color)] border-2"
+                        style="border-color: var(--text-color)"
+                        data-theme="blue"
+                        onclick="applyTheme('blue')"
+                        title="Blue Theme">
+                        <i class="fas fa-water text-[var(--text-color)]"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Add padding-top to the hero section to account for fixed header -->
+    <section class="bg-theme pt-24 pb-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-theme mb-6 leading-tight">
+                AI-Powered Development Assistant for VS Code
+            </h1>
+            <p class="text-lg sm:text-xl text-theme opacity-90 mb-8">
+                Context-aware AI chatbot that understands your codebase and helps you code faster
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-[var(--accent-color)] hover:bg-[var(--accent-dark)] text-white font-semibold rounded-lg transition duration-300">
+                    <i class="fas fa-download mr-2"></i>
+                    Install Extension
+                </button>
+                <button class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-[var(--accent-color)] font-semibold rounded-lg transition duration-300">
+                    <i class="fab fa-github mr-2"></i>
+                    View on GitHub
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add after hero section and before features -->
+    <section class="py-16 bg-[var(--bg-color)] border-t border-[var(--border-color)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <span class="text-[var(--accent-color)] font-semibold">Participating in</span>
+                <h2 class="text-3xl font-bold text-[var(--text-color)] mt-2">Fall in Love with DeepSeek Hackathon</h2>
+                <p class="text-[var(--text-color)] opacity-80 mt-4 max-w-2xl mx-auto">
+                    Building innovative AI-powered development tools using DeepSeek's advanced language models
+                </p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 mt-12">
+                <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+                    <div class="text-[var(--accent-color)] mb-4">
+                        <i class="fas fa-robot text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">DeepSeek Integration</h3>
+                    <p class="text-[var(--text-color)] opacity-80">
+                        Leveraging DeepSeek's powerful open-source LLMs for intelligent code understanding and generation
+                    </p>
+                </div>
+                <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+                    <div class="text-[var(--accent-color)] mb-4">
+                        <i class="fas fa-code-branch text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Open Source Innovation</h3>
+                    <p class="text-[var(--text-color)] opacity-80">
+                        Contributing to the AI community with open-source development tools and extensions
+                    </p>
+                </div>
+                <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)]">
+                    <div class="text-[var(--accent-color)] mb-4">
+                        <i class="fas fa-users text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Community Impact</h3>
+                    <p class="text-[var(--text-color)] opacity-80">
+                        Creating tools that enhance developer productivity and foster collaboration
+                    </p>
+                </div>
+            </div>
+            <div class="text-center mt-12">
+                <a href="https://lablab.ai/event/fall-in-love-with-deepseek" 
+                   target="_blank"
+                   class="inline-flex items-center px-6 py-3 bg-[var(--accent-color)] text-white font-semibold rounded-lg hover:bg-[var(--accent-dark)] transition duration-300">
+                    <i class="fas fa-heart mr-2"></i>
+                    View Hackathon Details
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Add after the hackathon section -->
+    <!-- <section id="team" class="py-16 bg-[var(--bg-color)] border-t border-[var(--border-color)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8">
+                <span class="text-[var(--accent-color)] font-semibold">Join Our Team</span>
+                <h2 class="text-3xl font-bold text-[var(--text-color)] mt-2">Looking for Team Members</h2>
+                <p class="text-[var(--text-color)] opacity-80 mt-4 max-w-2xl mx-auto">
+                    We're looking for passionate developers to join our team for this hackathon project
+                </p>
+                <div class="mt-8">
+                    <a href="https://docs.google.com/document/d/1J--toTo5Xr-ormGpixQ1Dqw78Vu7t-LC8o0YFf9vOAw/edit?usp=sharing" 
+                       target="_blank"
+                       class="inline-flex items-center px-6 py-3 bg-[var(--accent-color)] text-white font-semibold rounded-lg hover:bg-[var(--accent-dark)] transition duration-300">
+                        <i class="fas fa-users mr-2"></i>
+                        View Project Details & Join Team
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section> -->
+
+    <!-- Features Section -->
+    <section id="features" class="py-12 sm:py-16 bg-[var(--bg-color)] px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <span class="text-[var(--accent-color)] font-semibold">Capabilities</span>
+                <h2 class="text-3xl sm:text-4xl font-bold text-[var(--text-color)] mt-2">Core Features</h2>
+                <p class="text-[var(--text-color)] opacity-80 mt-4 max-w-2xl mx-auto">
+                    Powerful AI-driven features designed to enhance your development workflow
+                </p>
+            </div>
+
+            <div class="space-y-12">
+                <!-- VS Code Integration -->
+                <div class="feature-thread relative pl-8 md:pl-0">
+                    <div class="md:grid md:grid-cols-5 md:gap-8 items-center">
+                        <div class="md:col-span-2 mb-6 md:mb-0">
+                            <div class="aspect-w-16 aspect-h-9">
+                                <img src="extension-chat.png" alt="VS Code Extension Interface" class="rounded-lg shadow-lg object-cover bg-gray-900">
+                            </div>
+                        </div>
+                        <div class="md:col-span-3 relative">
+                            <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] relative">
+                                <div class="absolute -left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-[var(--accent-color)] rounded-full flex items-center justify-center text-white">
+                                    <i class="fas fa-code text-sm"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">VS Code Integration</h3>
+                                <p class="text-[var(--text-color)] opacity-80 mb-4">
+                                    Seamlessly integrated AI assistant that operates entirely within your code editor, providing real-time assistance and code suggestions.
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Real-time assistance</span>
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Native integration</span>
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Zero configuration</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Context-Aware Chat -->
+                <div class="feature-thread relative pl-8 md:pl-0">
+                    <div class="md:grid md:grid-cols-5 md:gap-8 items-center">
+                        <div class="md:col-span-3 mb-6 md:mb-0 md:order-1">
+                            <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] relative">
+                                <div class="absolute -left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-[var(--accent-color)] rounded-full flex items-center justify-center text-white">
+                                    <i class="fas fa-brain text-sm"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Context-Aware Chat</h3>
+                                <p class="text-[var(--text-color)] opacity-80 mb-4">
+                                    Intelligent chat system that understands your codebase context, making interactions more relevant and productive.
+                                </p>
+                                <div class="flex flex-wrap gap-3 mb-4">
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Smart context</span>
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Code awareness</span>
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Natural language</span>
+                                </div>
+                                <a href="context-aware-chat.html" class="inline-flex items-center text-[var(--accent-color)] hover:text-[var(--accent-dark)] transition-colors">
+                                    <span>Learn more</span>
+                                    <i class="fas fa-arrow-right ml-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <div class="aspect-w-16 aspect-h-9">
+                                <img src="extension-context-aware.png" alt="Context-Aware Chat Interface" class="rounded-lg shadow-lg object-cover bg-gray-900">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Modifications -->
+                <div class="feature-thread relative pl-8 md:pl-0">
+                    <div class="md:grid md:grid-cols-5 md:gap-8 items-center">
+                        <div class="md:col-span-2 mb-6 md:mb-0">
+                            <div class="aspect-w-16 aspect-h-9">
+                                <img src="extension-action.png" alt="Code Modifications" class="rounded-lg shadow-lg object-cover">
+                            </div>
+                        </div>
+                        <div class="md:col-span-3">
+                            <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] relative">
+                                <div class="absolute -left-4 top-1/2 transform -translate-y-1/2 w-8 h-8 bg-[var(--accent-color)] rounded-full flex items-center justify-center text-white">
+                                    <i class="fas fa-magic text-sm"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Code Modifications</h3>
+                                <p class="text-[var(--text-color)] opacity-80 mb-4">
+                                    Intelligent code modifications and refactoring suggestions that help maintain clean and efficient code.
+                                </p>
+                                <div class="flex flex-wrap gap-3">
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Auto refactoring</span>
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Code optimization</span>
+                                    <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Best practices</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Add connecting lines between features -->
+                <style>
+                    .feature-thread::before {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        bottom: 0;
+                        width: 2px;
+                        background: var(--accent-color);
+                        opacity: 0.2;
+                    }
+                    @media (min-width: 768px) {
+                        .feature-thread::before {
+                            left: 50%;
+                            transform: translateX(-50%);
+                        }
+                    }
+                </style>
+            </div>
+        </div>
+    </section>
+
+    <!-- Future Scope Section -->
+    <section class="py-16 bg-[var(--bg-color)] border-t border-[var(--border-color)]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <span class="text-[var(--accent-color)] font-semibold">What's Next</span>
+                <h2 class="text-3xl font-bold text-[var(--text-color)] mt-2">Future Scope</h2>
+                <p class="text-[var(--text-color)] opacity-80 mt-4 max-w-2xl mx-auto">
+                    Exciting features and capabilities we're working on for future releases
+                </p>
+            </div>
+
+            <!-- Knowledge Base and Context Aware Features -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold text-[var(--text-color)] mb-8 flex items-center">
+                    <i class="fas fa-plug text-[var(--accent-color)] mr-3"></i>
+                    Knowledge Base and Context Aware Features 
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Git Integration -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fab fa-git text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">In Progress</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Talk to Git</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Natural language interaction with Git repositories for seamless version control management.
+                        </p>
+                    </div>
+                    
+                    <!-- Internet Integration -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-globe text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">In Progress</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Internet Integration</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Access to internet resources for real-time documentation, StackOverflow solutions, and latest development trends while coding.
+                        </p>
+                    </div>
+
+                    <!-- Persistent Memory -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-memory text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">In Progress</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Persistent Memory</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Memory that persists across conversations for personalized AI interactions.
+                        </p>
+                    </div>
+
+                    <!-- Connect to Codebase DB -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-database text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Connect to Codebase DB</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Integration with codebase databases to improve context awareness.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Editor Textarea Features -->
+            <div class="mb-16">
+                <h3 class="text-2xl font-bold text-[var(--text-color)] mb-8 flex items-center">
+                    <i class="fas fa-brain text-[var(--accent-color)] mr-3"></i>
+                    Editor Textarea Features
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                    <!-- Auto Completion in Editor Textarea -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-code text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Auto Completion in Editor Textarea</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Similar to GitHub Copilot, it auto-completes code inside an editor's textarea.
+                        </p>
+                    </div>
+
+                    <!-- Select Text and Chat/Edit in Editor Textarea -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-edit text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Select Text and Chat/Edit in Editor Textarea</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Chat or edit the selected text directly in the editor, like GitHub Copilot.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+            
+            
+
+             <!-- Documentation Features -->
+             <div class="mb-16">
+                <h3 class="text-2xl font-bold text-[var(--text-color)] mb-8 flex items-center">
+                    <i class="fas fa-book text-[var(--accent-color)] mr-3"></i>
+                    Documentation Features
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                    <!-- Code Explainer and Documentation -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-book text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Code Explainer and Documentation</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Ability to visualize and explain complex legacy codebases.
+                        </p>
+                    </div>
+
+                    <!-- AI Tutorial Generator -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-chalkboard-teacher text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">AI Tutorial Generator</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Generate tutorials based on the codebase and user queries.
+                        </p>
+                    </div>
+
+                    <!-- Podcast from Codebase -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-podcast text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Podcast from Codebase</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Generate podcasts discussing the codebase and its features.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+             <!-- Miscellaneous Features -->
+             <div class="mb-16">
+                <h3 class="text-2xl font-bold text-[var(--text-color)] mb-8 flex items-center">
+                    <i class="fas fa-brain text-[var(--accent-color)] mr-3"></i>
+                    Miscellaneous Features
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Mobile Personal Assistant -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-mobile-alt text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Mobile Personal Assistant</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Voice-enabled personal assistant integrated into mobile, allowing the user to control the extension and interact with it like having a mid-level software engineer with him/her.
+                        </p>
+                    </div>
+
+                    <!-- LLM Debugger -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-bug text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">LLM Debugger</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Debugging capability for codebases using large language models (LLM) to identify and fix issues in code automatically.
+                        </p>
+                    </div>
+
+
+
+                    <!-- Computer Use -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-desktop text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Computer Use</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Automate processes of running code and checking changes, similar to Claude's computer use.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Optimization and Efficiency -->
+            <div class="mt-16">
+                <h3 class="text-2xl font-bold text-[var(--text-color)] mb-8 flex items-center">
+                    <i class="fas fa-tachometer-alt text-[var(--accent-color)] mr-3"></i>
+                    Optimization and Efficiency
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Model Selection -->
+                    <div class="bg-[var(--bg-color)] p-6 rounded-lg shadow-md border border-[var(--border-color)] transform hover:scale-105 transition-transform duration-300">
+                        <div class="text-[var(--accent-color)] mb-4 flex justify-between items-center">
+                            <i class="fas fa-microchip text-3xl"></i>
+                            <span class="bg-[var(--accent-color)] bg-opacity-20 text-white px-3 py-1 rounded-full text-sm font-medium">Coming Soon</span>
+                        </div>
+                        <h3 class="text-xl font-semibold text-[var(--text-color)] mb-3">Advanced Model Selection</h3>
+                        <p class="text-[var(--text-color)] opacity-80">
+                            Choose between different AI models optimized for specific tasks and performance requirements.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Additional sections for Pricing, Installation, etc. can be added following the same pattern -->
+
+    <!-- Add mobile menu script -->
+    <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuButton = document.querySelector('button[onclick="toggleMobileMenu()"]');
+            
+            if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobileMenu').classList.add('hidden');
+            });
+        });
+
+        // Close mobile menu on resize if screen becomes larger
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) { // md breakpoint
+                document.getElementById('mobileMenu').classList.add('hidden');
+            }
+        });
+    </script>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="space-y-4">
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-code text-[var(--accent-light)] text-2xl"></i>
+                        <a href="https://hackathons-circle.vercel.app/" 
+                           target="_blank"
+                           class="font-bold text-xl text-white hover:text-[var(--accent-light)] transition duration-300">
+                            Hackathon Circle
+                        </a>
+                    </div>
+                    <p class="text-gray-400">Building the future together through innovation and collaboration.</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4 text-white">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#about" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">About</a></li>
+                        <li><a href="#new-member" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">Join Us</a></li>
+                        <li><a href="#ideation-board" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">Ideation</a></li>
+                        <li><a href="#hackathons" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">Hackathons</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4 text-white">Community</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#members" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">Members</a></li>
+                        <li><a href="#communication-channels" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">Connect</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-lg mb-4 text-white">Connect With Us</h3>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">
+                            <i class="fab fa-twitter text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">
+                            <i class="fab fa-github text-xl"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-[var(--accent-light)] transition duration-300">
+                            <i class="fab fa-linkedin text-xl"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 py-6 text-center text-gray-400">
+                <p>&copy; 2024 <a href="https://hackathons-circle.vercel.app/" 
+                                 target="_blank" 
+                                 class="hover:text-[var(--accent-light)] transition duration-300">Hackathon Circle</a>. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+            class="fixed bottom-8 right-8 p-4 bg-[var(--accent-color)] text-[var(--bg-color)] rounded-full shadow-lg hover:bg-[var(--accent-dark)] transition duration-300 hidden md:block">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+</body>
+</html>

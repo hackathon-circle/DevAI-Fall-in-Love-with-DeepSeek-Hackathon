@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev AI Chat</title>
+    <link rel="stylesheet" href="chat.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css">
+</head>
+<body>
+    <div id="chat-header">
+        <h1>Dev AI Assistant</h1>
+        <button class="new-chat-button" id="new-chat-button">+ New Chat</button>
+    </div>
+    <div id="chat-container"></div>
+    <div id="input-container">
+        <div id="file-display"></div>
+        <div id="config-container">
+            <label>
+                Model
+                <select id="model-select">
+                    <optgroup label="Production Models">
+                        <option value="mixtral-8x7b-32768">Mixtral 8x7B</option>
+                        <option value="gemma2-9b-it">Gemma2 9B</option>
+                        <option value="llama-3.3-70b-versatile">Llama 3.3 70B</option>
+                        <option value="llama-3.1-8b-instant">Llama 3.1 8B</option>
+                        <option value="llama3-70b-8192">Llama3 70B</option>
+                        <option value="llama3-8b-8192">Llama3 8B</option>
+                    </optgroup>
+                    <optgroup label="Preview Models">
+                        <option value="deepseek-r1-distill-llama-70b">DeepSeek R1 70B</option>
+                        <option value="llama-3.2-1b-preview">Llama 3.2 1B</option>
+                        <option value="llama-3.2-3b-preview">Llama 3.2 3B</option>
+                    </optgroup>
+                </select>
+            </label>
+            <label>
+                Temperature
+                <input type="number" id="temperature-input" min="0" max="2" step="0.1" value="1">
+            </label>
+            <label>
+                Max Tokens
+                <input type="number" id="max-tokens-input" min="1" max="32768" value="1024">
+            </label>
+        </div>
+        <div class="input-row">
+            <input type="text" id="message-input" placeholder="Type your message...">
+            <button class="attachment-button" id="attachment-button" title="Add attachment">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path d="M21.586 10.461l-10.05 10.075c-1.95 1.949-5.122 1.949-7.071 0s-1.95-5.122 0-7.072l10.628-10.585c1.17-1.17 3.073-1.17 4.243 0 1.169 1.17 1.169 3.072 0 4.242l-8.507 8.464c-.39.39-1.024.39-1.414 0s-.39-1.024 0-1.414l7.093-7.05-1.415-1.414-7.093 7.049c-1.17 1.17-1.17 3.073 0 4.243 1.17 1.169 3.072 1.169 4.244 0l8.507-8.464c1.95-1.95 1.95-5.123 0-7.072-1.95-1.949-5.123-1.949-7.072 0L3.051 12.048c-2.73 2.729-2.73 7.171 0 9.9 2.729 2.728 7.17 2.728 9.9 0l10.05-10.075-1.415-1.414z"/>
+                </svg>
+            </button>
+            <button id="send-button">Send</button>
+        </div>
+    </div>
+    <script src="chat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+</body>
+</html> 

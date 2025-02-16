@@ -1,0 +1,75 @@
+{
+  "name": "dev-ai",
+  "displayName": "dev-ai",
+  "description": "dev-ai",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "files": [
+    "out/**/*",
+    "src/templates/*"
+  ],
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "dev-ai-chat",
+          "title": "Dev AI Chat",
+          "icon": "resources/chat.svg"
+        }
+      ]
+    },
+    "views": {
+      "dev-ai-chat": [
+        {
+          "id": "devAiChatView",
+          "name": "Chat",
+          "type": "webview"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "dev-ai.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "dev-ai.openChat",
+        "title": "Open Dev AI Chat"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "dependencies": {
+    "@types/marked": "^5.0.2",
+    "@types/xml2js": "^0.4.14",
+    "dotenv": "^16.4.5",
+    "fast-xml-parser": "^4.5.1",
+    "marked": "^15.0.7",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.96.0",
+    "@typescript-eslint/eslint-plugin": "^8.17.0",
+    "@typescript-eslint/parser": "^8.17.0",
+    "eslint": "^9.16.0",
+    "typescript": "^5.7.2",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}

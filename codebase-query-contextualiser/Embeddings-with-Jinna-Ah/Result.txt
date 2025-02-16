@@ -1,0 +1,37 @@
+🔍 **Query:** Give me generate_response_groq function
+
+🎯 **Top Matches:**
+
+1. FILE: data/app.py
+TYPE: py
+CONTEXT: Function: generate_response_groq
+
+📌 **Code Preview:**
+def generate_response_groq(context, query):
+    """Generate response using Groq API."""
+    prompt = f"Context: {context}\nQuestion: {query}\nAnswer:"
+    chat_completion = client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": pro...
+
+--------------------------------------------------------------------------------
+
+2. FILE: data/app.py
+TYPE: py
+CONTEXT: Function: extract_text_from_pdf
+
+📌 **Code Preview:**
+def extract_text_from_pdf(pdf_file):
+    """Extract text from PDF file using pdfplumber."""
+    text = ""
+    with pdfplumber.open(pdf_file) as pdf:
+        for page in pdf.pages:
+            text += page.extract_text() or ""
+    return text
+...
+
+--------------------------------------------------------------------------------
+<ipython-input-3-58041619b64a>:134: DeprecationWarning: `search` method is deprecated and will be removed in the future. Use `query_points` instead.
+  results = self.client.search(

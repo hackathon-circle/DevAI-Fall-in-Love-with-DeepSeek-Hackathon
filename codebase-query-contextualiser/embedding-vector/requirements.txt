@@ -1,0 +1,8 @@
+transformers
+torch
+sentence-transformers
+qdrant-client
+camel-ai
+pillow
+pandas
+unstructured

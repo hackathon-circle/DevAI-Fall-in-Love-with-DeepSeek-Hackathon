@@ -1,0 +1,29 @@
+# Request Example
+<QUERY>
+Make text 'Code Search' capitalize whole word.
+</QUERY>
+
+<FILE_PATH>
+/index.html
+</FILE_PATH>
+<CODE_TO_CHANGE>
+1  <!DOCTYPE html>
+2  <html>
+3  <head>
+4      <title>Code Search</title>
+5  </head>
+</CODE_TO_CHANGE>
+
+</INSTRUCTION>
+    RESPONSE IN THIS FORMAT
+    <DESCRIPTION>
+    Here is the code for Code Search
+    </DESCRIPTION>
+
+    <EDITOR_APPLY>
+    4      <title>CODE SEARCH</title>
+    </EDITOR_APPLY>
+
+    <TERMINAL_COMMAND>
+    </TERMINAL_COMMAND>
+</INSTRUCTION>

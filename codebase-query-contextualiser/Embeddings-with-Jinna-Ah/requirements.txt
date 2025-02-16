@@ -1,0 +1,7 @@
+torch
+transformers
+qdrant-client
+numpy
+regex
+pathlib
+logging
