@@ -2,7 +2,7 @@
 https://lablab.ai/event/fall-in-love-with-deepseek
 
 # Vscode Extension Repo
-[dev-ai](dev-ai])
+[dev-ai](Extension Repo])
 
 [Context-aware code and experimental codes](context-aware-code-and-experimental-codes)
 
